@@ -137,9 +137,9 @@ class Plane3D extends Drawable{
             gl.bindBuffer( gl.ARRAY_BUFFER, Plane3D.textureCoordBuffer);
        	    gl.vertexAttribPointer(Plane3D.aTextureCoordShader, 2, gl.FLOAT, false, 0, 0 );
 			
-            gl.activeTexture(gl.TEXTURE0);
+            gl.activeTexture(gl.TEXTURE1);
             gl.bindTexture(gl.TEXTURE_2D, Plane3D.texture);
-            gl.uniform1i(Plane3D.uTextureUnitShader,0);
+            gl.uniform1i(Plane3D.uTextureUnitShader,1);
 
 			gl.uniformMatrix4fv(Plane3D.uModelMatrixShader, false, flatten(this.modelMatrix));
 			gl.uniformMatrix4fv(Plane3D.uCameraMatrixShader, false, flatten(camera.cameraMatrix));

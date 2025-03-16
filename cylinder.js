@@ -183,7 +183,7 @@ class Cylinder3D extends Drawable{
         Cylinder3D.initializeTexture(); 
         //Cylinder3D.divideQuad(a, b, c, d, 5);
 
-        Cylinder3D.shaderProgram = initShaders( gl, "/cylinderVShader.glsl", "/cylinderFShader.glsl");
+        Cylinder3D.shaderProgram = initShaders( gl, "vshaderPlane.glsl", "fshaderPlane.glsl");
 
         // Load the data into the GPU
         Cylinder3D.positionBuffer = gl.createBuffer();
@@ -210,7 +210,7 @@ class Cylinder3D extends Drawable{
         Cylinder3D.uCameraMatrixShader = gl.getUniformLocation( Cylinder3D.shaderProgram, "cameraMatrix" );
         Cylinder3D.uProjectionMatrixShader = gl.getUniformLocation( Cylinder3D.shaderProgram, "projectionMatrix" );
 
-        Cylinder3D.uMatDiffColorShader = gl.getUniformLocation( Cylinder3D.shaderProgram, "matDiffColor" );
+        //Cylinder3D.uMatDiffColorShader = gl.getUniformLocation( Cylinder3D.shaderProgram, "matDiffColor" );
         Cylinder3D.uMatSpecColorShader = gl.getUniformLocation( Cylinder3D.shaderProgram, "matSpecColor" );
         Cylinder3D.uMatAlphaShader = gl.getUniformLocation( Cylinder3D.shaderProgram, "matAlpha" );
 
@@ -241,12 +241,14 @@ class Cylinder3D extends Drawable{
 
         gl.bindBuffer( gl.ARRAY_BUFFER, Cylinder3D.textureBuffer);
        	gl.vertexAttribPointer(Cylinder3D.aTextureCoordShader, 2, gl.FLOAT, false, 0, 0 );
-        
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, Cylinder3D.texture);
+        gl.uniform1i(Cylinder3D.uTextureUnitShader,0);
         console.log(camera1.projectionMatrix);
 
         gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, Cylinder3D.indexBuffer);
 
-        gl.uniform4fv(Cylinder3D.uMatDiffColorShader, this.matDiffColor);
+        //gl.uniform4fv(Cylinder3D.uMatDiffColorShader, this.matDiffColor);
         gl.uniform4fv(Cylinder3D.uMatSpecColorShader, this.matSpecColor);
         gl.uniform1f(Cylinder3D.uMatAlphaShader, this.matAlpha);
 
