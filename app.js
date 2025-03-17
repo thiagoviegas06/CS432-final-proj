@@ -2,6 +2,8 @@ var canvas;
 var gl;
 var angle = 0.0;
 
+var objects = [];
+
 class Light{
     constructor(loc,dir,color,alpha,cutoff,type){
     	this.location = loc;
@@ -47,12 +49,15 @@ class Camera{
     }
 }
 
-var camera1 = new Camera(vec3(0,0,7), vec3(1,0,0), normalize(vec3(0,1,0)), normalize(vec3(0,0,1)));
+var camera1 = new Camera(vec3(0,0.25,5), vec3(1,0,0), normalize(vec3(0,1,0)), normalize(vec3(0,0,1)));
 var camera2 = new Camera(vec3(0,5,1), vec3(1,0,0), normalize(vec3(0,0,-1)), normalize(vec3(0,1,0)));
 
-var light1 = new Light(vec3(2,2,2),vec3(-1,-1,-1),vec4(0.588,0.706,0.863,1),0,45,1);
+var light1 = new Light(vec3(2,2,2), vec3(-1,-1,-1), vec4(1.0, 0.85, 0.6, 1), 0, 90, 1);
+
 
 console.log(light1);
+console.log("CAMERA 1");
+console.log(camera1.cameraMatrix);
 
 class Drawable{
     
@@ -101,7 +106,7 @@ class Drawable{
 
 	this.modelMatrix = mult(t,mult(s,mult(rz,mult(ry,rx))));
 
-	console.log(this.modelMatrix);
+
 
     }
 
@@ -122,8 +127,8 @@ function balloonAnimation(deltaTime) {
     time += deltaTime ;
     realtime += deltaTime;
 
-    console.log("time", time);
-    console.log("realtime", realtime);  
+    //console.log("time", time);
+    //console.log("realtime", realtime);  
 
     let y = 0; 
 
@@ -140,7 +145,7 @@ function balloonAnimation(deltaTime) {
     y = Math.sin(time*Math.PI*0.1) * 0.0025;  // Smooth up and down oscillation
 
 
-    console.log("y", y);    
+    //console.log("y", y);    
 
     balloon.updateObjPosition(x, y, z);
 }
@@ -151,6 +156,8 @@ var plane;
 var goal;
 var cylinder;
 var hat;
+var mirror;
+var planes = [];
 
 var balloon;
 
@@ -165,16 +172,18 @@ window.onload = function init(){
     gl.clearColor( 0.2, 0.2, 0.2, 1.0);
     gl.enable(gl.DEPTH_TEST);
 
-	
-    var pos = vec3(0,-2,2);
+	var camera1Position = camera1.vrp;
+    var pos = vec3(camera1Position[0],camera1Position[1],camera1Position[2]);
     var rot = vec3(0,0,0);
     var scale = 1.0;
     var diffcolor = vec4(0.0,1.0,0.0,1.0);
     var diffcolor2 = vec4(1.0,1.0,1.0,1.0);
     var speccolor = vec4(1.0,1.0,1.0,1.0);
-    var shine = 5.0; 
-    tri = new Cube(pos[0],pos[1],pos[2],scale,rot[0],rot[1],rot[2],diffcolor,speccolor,shine);
+    var shine = 2.0; 
 
+
+    tri = new Cube(pos[0],pos[1],pos[2],scale,rot[0],rot[1],rot[2],diffcolor,speccolor,shine);
+    objects.push(tri);
 
 
     var rotY = 57*Math.PI ;
@@ -186,9 +195,36 @@ window.onload = function init(){
     //penguin = new SMFModel("./models/bound-cow.smf",diffcolor2,speccolor,shine);
 
     cylinder = new Cylinder3D(0,0.5,0,0.5,0,0,0,diffcolor2,speccolor,shine); 
-    plane = new Plane3D(0,-0.2,0,10,0,0,0, diffcolor,speccolor, shine);
-    hat = new TowerHat(0,1.75,0,0.5,0,0,0,diffcolor2, speccolor, shine);
+    //plane = new Plane3D(0,-0.1,0,2,0,0,0, diffcolor,speccolor, shine);
 
+    var firstX = 0;
+    var firstZ = 0;
+
+    for(let i = -10; i <= 10; i+=2){
+        for(let j = -10; j <= 10; j+=2){
+            let curPlane =  new Plane3D(firstX + i, -0.25, firstZ + j, 1, 0, 0, 0, diffcolor, speccolor, shine);
+            planes.push(curPlane);
+        } 
+    }
+
+    for(let i = 0; i < planes.length; i++){
+        objects.push(planes[i]);
+    }
+    
+
+
+    hat = new TowerHat(0,1.75,0,0.5,0,0,0,diffcolor2, speccolor, shine);
+    mirror = new Mirror(0,0,0,1,0,0,0,diffcolor2,speccolor,shine);
+
+   
+    //objects.push(plane);
+    objects.push(balloon);
+    objects.push(cylinder); 
+    objects.push(hat);
+    
+    //objects.push(mirror);
+
+ 
     requestAnimationFrame(render);
     
 };
@@ -280,9 +316,14 @@ function myfunction(event){
     
             if(currentCamera === camera1){
                 currentCamera = camera2;
+                let camera2Position = camera2.vrp;
+
+                tri.updateT(camera2Position[0],camera2Position[1],camera2Position[2]);
                 console.log("switching to camera 2");
             }else{
                 currentCamera = camera1;
+                let camera1Position = camera1.vrp;
+                tri.updateT(camera1Position[0],camera1Position[1],camera1Position[2]);
                 console.log("switching to camera 1");
             }
             
@@ -308,15 +349,15 @@ function render(now){
     var deltaTime = now - then;
     then = now;
 
-    balloonAnimation(deltaTime);
+    //balloonAnimation(deltaTime);
 
 
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    tri.draw(currentCamera);
-    plane.draw(currentCamera);
-    balloon.draw(currentCamera);
-    cylinder.draw(currentCamera); 
-    hat.draw(currentCamera); 
+
+    for(let i = 0; i < objects.length; i++){
+        objects[i].draw(currentCamera);
+    }
+    
 	
    
 

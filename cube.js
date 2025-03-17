@@ -156,11 +156,11 @@ class Cube extends Drawable{
 
 		gl.enableVertexAttribArray(Cube.aPositionShader);
         //gl.enableVertexAttribArray(Cube.aTextureCoordShader);
-		gl.disable(gl.DEPTH_TEST);
+		gl.depthMask(false); 
 		
 		gl.drawElements(gl.TRIANGLES, Cube.indices.length, gl.UNSIGNED_INT, 0);
     	gl.disableVertexAttribArray(Cube.aPositionShader);
-		gl.enable(gl.DEPTH_TEST);
+		gl.depthMask(true);
 
         //gl.disableVertexAttribArray(Cube.aTextureCoordShader);
     	
