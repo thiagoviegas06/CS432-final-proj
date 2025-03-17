@@ -183,7 +183,7 @@ class Cylinder3D extends Drawable{
         Cylinder3D.initializeTexture(); 
         //Cylinder3D.divideQuad(a, b, c, d, 5);
 
-        Cylinder3D.shaderProgram = initShaders( gl, "vshaderPlane.glsl", "fshaderPlane.glsl");
+        Cylinder3D.shaderProgram = initShaders( gl, "./vshaders/vshaderPlane.glsl", "./fshaders/fshaderPlane.glsl");
 
         // Load the data into the GPU
         Cylinder3D.positionBuffer = gl.createBuffer();

@@ -50,7 +50,7 @@ class Camera{
 var camera1 = new Camera(vec3(0,0,7), vec3(1,0,0), normalize(vec3(0,1,0)), normalize(vec3(0,0,1)));
 var camera2 = new Camera(vec3(0,5,1), vec3(1,0,0), normalize(vec3(0,0,-1)), normalize(vec3(0,1,0)));
 
-var light1 = new Light(vec3(0,2,0),vec3(0,-1,-0),vec4(0.75,0.75,0.75,1),0,45,1);
+var light1 = new Light(vec3(2,2,2),vec3(-1,-1,-1),vec4(0.588,0.706,0.863,1),0,45,1);
 
 console.log(light1);
 
@@ -113,12 +113,48 @@ class Drawable{
        	this.modelMatrix = mm;
     }
 }
+let sign = 1; // Declare sign globally
+let up = 0, down = 0;
+let time = 0;
+let realtime = 0;
+
+function balloonAnimation(deltaTime) {
+    time += deltaTime ;
+    realtime += deltaTime;
+
+    console.log("time", time);
+    console.log("realtime", realtime);  
+
+    let y = 0; 
+
+    
+    if (realtime > 20) {
+        sign *= -1;  
+        realtime = 0;
+    }
+
+    let radius = 0.009 + Math.sin(time) * 0.005;
+    let x = Math.cos(time) * radius *0.1 ;
+    let z = Math.sin(time) * radius * 0.1; 
+
+    y = Math.sin(time*Math.PI*0.1) * 0.0025;  // Smooth up and down oscillation
+
+
+    console.log("y", y);    
+
+    balloon.updateObjPosition(x, y, z);
+}
+
 
 var tri;
 var plane; 
 var goal;
 var cylinder;
 var hat;
+
+var balloon;
+
+var then = 0.0;
 
 window.onload = function init(){
     canvas = document.getElementById( "gl-canvas" );
@@ -139,18 +175,22 @@ window.onload = function init(){
     var shine = 5.0; 
     tri = new Cube(pos[0],pos[1],pos[2],scale,rot[0],rot[1],rot[2],diffcolor,speccolor,shine);
 
+
+
     var rotY = 57*Math.PI ;
 
-    goal = new ObjParser("./models/soccerGoal.obj", 1, 0,1, 0.005, 0,rotY,0, diffcolor2,speccolor,shine/2);
+
+    balloon = new ObjParser("./models/ballon/balloon.obj", 2,2,0, 0.0025, 0,0,0, diffcolor2,speccolor,shine/2);
+
 
     //penguin = new SMFModel("./models/bound-cow.smf",diffcolor2,speccolor,shine);
 
-    cylinder = new Cylinder3D(0,0,0,0.5,0,0,0,diffcolor2,speccolor,shine); 
+    cylinder = new Cylinder3D(0,0.5,0,0.5,0,0,0,diffcolor2,speccolor,shine); 
     plane = new Plane3D(0,-0.2,0,10,0,0,0, diffcolor,speccolor, shine);
-    hat = new TowerHat(0,1.25,0,0.5,0,0,0,diffcolor2, speccolor, shine);
+    hat = new TowerHat(0,1.75,0,0.5,0,0,0,diffcolor2, speccolor, shine);
 
-
-    render(camera1);
+    requestAnimationFrame(render);
+    
 };
 
 function rotateAroundV(theta){
@@ -177,7 +217,7 @@ function myfunction(event){
                 camera1.vrp = newPosition;
                 tri.updateT(newX,newY,newZ);
                 camera1.updateCameraMatrix();
-                render(camera1); 
+               
             }
             break;
         case "KeyS":
@@ -190,7 +230,7 @@ function myfunction(event){
                 camera1.vrp = newPositionS;
                 tri.updateT(newSX,newSY,newSZ);
                 camera1.updateCameraMatrix();
-                render(camera1); 
+               
             }
             break;
         case "KeyA":
@@ -204,7 +244,7 @@ function myfunction(event){
                 camera1.vrp = newPositionA;
                 tri.updateT(newAX,newAY,newAZ);
                 camera1.updateCameraMatrix(camera1);
-                render(camera1); 
+               
             }
             break;
             
@@ -218,7 +258,7 @@ function myfunction(event){
                 camera1.vrp = newPositionD;
                 tri.updateT(newDX, newDY,newDZ);
                 camera1.updateCameraMatrix();
-                render(camera1); 
+               
             }
             break;
 
@@ -226,14 +266,14 @@ function myfunction(event){
             if(currentCamera === camera1){
                 rotateAroundV(1);
                 camera1.updateCameraMatrix();
-                render(camera1);
+                
             }
 			break;
         case "KeyE":
             if(currentCamera === camera1){
                 rotateAroundV(-1);
                 camera1.updateCameraMatrix();
-                render(camera1);
+                
             }
 			break;
         case "Space":
@@ -245,14 +285,14 @@ function myfunction(event){
                 currentCamera = camera1;
                 console.log("switching to camera 1");
             }
-            render(currentCamera); 
+            
             break;
         case "KeyP":
             if(currentCamera === camera1){
                 tri.updateT(0,0,1);
                 console.log("this is tri mondels\n"); 
                 console.log(tri.modelMatrix);
-                render(currentCamera); 
+                
             }
             break;
     }
@@ -260,15 +300,27 @@ function myfunction(event){
    
 }
 
-function render(camera){
+window.addEventListener("keydown", myfunction);
+
+function render(now){
+
+    now = now*0.001;
+    var deltaTime = now - then;
+    then = now;
+
+    balloonAnimation(deltaTime);
+
+
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-    tri.draw(camera);
-    plane.draw(camera);
-    //goal.draw(camera); 
-	//penguin.draw(camera1);
-    cylinder.draw(camera); 
-    hat.draw(camera); 
-	window.addEventListener("keydown", myfunction);
+    tri.draw(currentCamera);
+    plane.draw(currentCamera);
+    balloon.draw(currentCamera);
+    cylinder.draw(currentCamera); 
+    hat.draw(currentCamera); 
+	
+   
+
+    requestAnimationFrame(render);
 }
 
 

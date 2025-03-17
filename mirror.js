@@ -37,7 +37,7 @@ class Mirror extends Drawable{
     }
 
     static initialize() {
-        Mirror.shaderProgram = initShaders( gl, "/mirrorVshader.glsl", "/mirrorFShader.glsl");
+        Mirror.shaderProgram = initShaders( gl, "./vshaders/mirrorVshader.glsl", "./fshaders/mirrorFShader.glsl");
         Mirror.initializeTexture();
 
         // Load the data into the GPU

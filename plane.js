@@ -68,7 +68,7 @@ class Plane3D extends Drawable{
 
             Plane3D.divideQuad(a, b, c, d, 5);
 
-			Plane3D.shaderProgram = initShaders( gl, "/vshaderPlane.glsl", "/fshaderPlane.glsl");
+			Plane3D.shaderProgram = initShaders( gl, "./vshaders/vshaderPlane.glsl", "./fshaders/fshaderPlane.glsl");
 
 			// Load the data into the GPU
 			Plane3D.positionBuffer = gl.createBuffer();
@@ -111,7 +111,7 @@ class Plane3D extends Drawable{
                 
             }
             
-            imagePlane.src = "256x grass block.png";
+            imagePlane.src = "./textures/256x grass block.png";
         }
 		
 		constructor(tx,ty,tz,scale,rotX,rotY,rotZ,diffcolor,speccolor,sh){

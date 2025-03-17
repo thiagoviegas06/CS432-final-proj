@@ -51,7 +51,7 @@ class Cube extends Drawable{
 
     static initialize() {
         //Cube.computeNormals();
-    	Cube.shaderProgram = initShaders( gl, "/skyVshader.glsl", "/skyFshader.glsl");
+    	Cube.shaderProgram = initShaders( gl, "./vshaders/skyVshader.glsl", "./fshaders/skyFshader.glsl");
 
 		// Load the data into the GPU
 		Cube.positionBuffer = gl.createBuffer();

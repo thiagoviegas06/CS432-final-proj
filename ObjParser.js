@@ -106,7 +106,7 @@ class ObjParser{
 	//static texture = -1;
 
     static initialize(){
-        ObjParser.shaderProgram = initShaders( gl, "/vshader2.glsl", "/fshader2.glsl");
+        ObjParser.shaderProgram = initShaders( gl, "./vshaders/vshader2.glsl", "./fshaders/fshader2.glsl");
 
         //Index Buffer
         ObjParser.positionBuffer = gl.createBuffer();
@@ -179,4 +179,17 @@ class ObjParser{
 		gl.disableVertexAttribArray(ObjParser.aNormalShader);
 		//gl.disableVertexAttribArray(ObjParser.aTextCoordShader);
     }
+
+
+	updateObjPosition(tx,ty,tz){
+		let t = translate(tx,ty,tz);
+		ObjParser.modelMatrix = mult(t, ObjParser.modelMatrix);
+	}
+
+	getObjPosition(){
+		return ObjParser.modelMatrix;
+	}
+
+
+
 }

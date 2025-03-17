@@ -92,7 +92,7 @@ class TowerHat extends Drawable{
         TowerHat.calculateXZCoord(1.1, 10, 1);
         //TowerHat.divideQuad(a, b, c, d, 5);
 
-        TowerHat.shaderProgram = initShaders( gl, "/vshader.glsl", "/fshader.glsl");
+        TowerHat.shaderProgram = initShaders( gl, "./vshaders/vshader.glsl", "./fshaders/fshader.glsl");
 
         // Load the data into the GPU
         TowerHat.positionBuffer = gl.createBuffer();
