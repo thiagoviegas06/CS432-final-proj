@@ -101,8 +101,6 @@ class Cylinder3D extends Drawable{
             Cylinder3D.indices.push(val5);
         }
 
-        console.log("texture:"); 
-        console.log(Cylinder3D.textureCoords); 
     }
 
     /*

@@ -159,6 +159,11 @@ class ObjParser{
 		//gl.vertexAttribPointer(ObjParser.aTextCoordShader, 2, gl.FLOAT, false, 0 ,0 );
 		
         gl.uniformMatrix4fv(ObjParser.uModelMatrixShader, false, flatten(ObjParser.modelMatrix));
+
+
+		console.log("OBJ MODEL MATRIX");
+		console.log(camera1.cameraMatrix);
+		console.log(camera1.projectionMatrix);
         gl.uniformMatrix4fv(ObjParser.uCameraMatrixShader, false, flatten(camera1.cameraMatrix));
         gl.uniformMatrix4fv(ObjParser.uProjectionMatrixShader, false, flatten(camera1.projectionMatrix));
 

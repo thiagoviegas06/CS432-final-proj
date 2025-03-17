@@ -23,9 +23,6 @@ class Plane3D extends Drawable{
     static divideQuad(a, b, c, d, a_tex, b_tex, c_tex, d_tex, depth) {
         if (depth>0) {
 
-            console.log("Subdivision Depth:", depth);
-            console.log("a_tex:", a_tex, "b_tex:", b_tex, "c_tex:", c_tex, "d_tex:", d_tex);
-
             var v1 = mult(0.5,add(a,b));
             var v2 = mult(0.5,add(b,c));
             var v3 = mult(0.5,add(c,d));
@@ -34,7 +31,6 @@ class Plane3D extends Drawable{
 
             var v1_tex = mult(0.5, add(a_tex, b_tex));
             var v2_tex = mult(0.5, add(b_tex, c_tex));
-            console.log("v2_tex:", v2_tex);
             var v3_tex = mult(0.5, add(c_tex, d_tex));
             var v4_tex = mult(0.5, add(d_tex, a_tex));
             var v5_tex = mult(0.5, add(a_tex, c_tex));

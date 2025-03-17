@@ -30,8 +30,21 @@ class Mirror extends Drawable{
 
     static texsize = 256;
 
+    static tx = 0;
+    static ty = 0;
+    static tz = 0;
+
     constructor(tx,ty,tz,scale,rotX,rotY,rotZ,diffcolor,speccolor,sh){
         super(tx,ty,tz,scale,rotX,rotY,rotZ,diffcolor,speccolor,sh);
+        Mirror.tx = tx;
+        Mirror.ty = ty;
+        Mirror.tz = tz;
+        console.log("MIRROR CONSTRUCTOR");
+        console.log(Mirror.tx);
+        console.log(Mirror.ty);
+        console.log(Mirror.tz);
+
+
         if(Mirror.shaderProgram == -1)
         Mirror.initialize()
         
@@ -96,7 +109,10 @@ class Mirror extends Drawable{
         gl.viewport(0, 0, Mirror.texsize, Mirror.texsize);
 
         camera.projectionMatrix = perspective(90.0, 1.0, 0.1, 100);
+        
         camera.vrp = vec3(Mirror.tx , Mirror.ty , Mirror.tz);
+        console.log("VRP IN MIRROR");
+        console.log(camera.vrp);    
 
         gl.bindFramebuffer(gl.FRAMEBUFFER, Mirror.frameBuffer);
 
@@ -108,7 +124,8 @@ class Mirror extends Drawable{
         gl.bindTexture(gl.TEXTURE_2D, Mirror.texture);
 
         camera.updateCameraMatrix();
-
+        console.log("CAMERA MATRIX IN MIRROR");
+        console.log(camera.cameraMatrix);
         const framebufferStatus = gl.checkFramebufferStatus(gl.FRAMEBUFFER);
         if (framebufferStatus !== gl.FRAMEBUFFER_COMPLETE) {
             console.error("Framebuffer is not complete:", framebufferStatus);

@@ -131,8 +131,6 @@ class TowerHat extends Drawable{
         gl.uniformMatrix4fv(TowerHat.uModelMatrixShader, false, flatten(this.modelMatrix));
         gl.uniformMatrix4fv(TowerHat.uCameraMatrixShader, false, flatten(camera.cameraMatrix));
         gl.uniformMatrix4fv(TowerHat.uProjectionMatrixShader, false, flatten(camera.projectionMatrix));
-        
-        console.log(camera1.projectionMatrix);
 
         gl.uniform4fv(TowerHat.uMatDiffColorShader, this.matDiffColor);
         gl.uniform4fv(TowerHat.uMatSpecColorShader, this.matSpecColor);

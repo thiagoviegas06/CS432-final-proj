@@ -214,7 +214,7 @@ window.onload = function init(){
 
 
     hat = new TowerHat(0,1.75,0,0.5,0,0,0,diffcolor2, speccolor, shine);
-    mirror = new Mirror(0,0,0,1,0,0,0,diffcolor2,speccolor,shine);
+    mirror = new Mirror(1,0.5,1,1,0,0,0,diffcolor2,speccolor,shine);
 
    
     //objects.push(plane);
@@ -222,7 +222,7 @@ window.onload = function init(){
     objects.push(cylinder); 
     objects.push(hat);
     
-    //objects.push(mirror);
+    objects.push(mirror);
 
  
     requestAnimationFrame(render);
@@ -355,6 +355,7 @@ function render(now){
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     for(let i = 0; i < objects.length; i++){
+        console.log("Drawing object", objects[i]);
         objects[i].draw(currentCamera);
     }
     
