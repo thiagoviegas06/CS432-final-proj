@@ -2,6 +2,7 @@
 
 in vec3 aPosition;       
 in vec2 aTexCoord;
+
 out vec3 R; 
 
 out vec3 L;

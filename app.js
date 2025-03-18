@@ -117,6 +117,10 @@ class Drawable{
     setModelMatrix(mm){
        	this.modelMatrix = mm;
     }
+
+    isMirror(){
+        return false;
+    }
 }
 let sign = 1; // Declare sign globally
 let up = 0, down = 0;
@@ -152,6 +156,8 @@ function balloonAnimation(deltaTime) {
 
 
 var tri;
+
+var fakeSkybox;
 var plane; 
 var goal;
 var cylinder;
@@ -183,7 +189,10 @@ window.onload = function init(){
 
 
     tri = new Cube(pos[0],pos[1],pos[2],scale,rot[0],rot[1],rot[2],diffcolor,speccolor,shine);
+    fakeSkybox = new Cube(1,0.5,1,10,0,0,0,diffcolor2,speccolor,shine);
     objects.push(tri);
+
+    objects.push(fakeSkybox);
 
 
     var rotY = 57*Math.PI ;
@@ -214,7 +223,7 @@ window.onload = function init(){
 
 
     hat = new TowerHat(0,1.75,0,0.5,0,0,0,diffcolor2, speccolor, shine);
-    mirror = new Mirror(1,0.5,1,1,0,0,0,diffcolor2,speccolor,shine);
+    mirror = new Mirror(1,0.25,1,0.5,0,0,0,diffcolor2,speccolor,shine);
 
    
     //objects.push(plane);
@@ -355,8 +364,10 @@ function render(now){
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
     for(let i = 0; i < objects.length; i++){
-        console.log("Drawing object", objects[i]);
-        objects[i].draw(currentCamera);
+        if(i !== 1){
+            objects[i].draw(currentCamera);
+        }
+        
     }
     
 	

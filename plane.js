@@ -77,7 +77,7 @@ class Plane3D extends Drawable{
             var c_tex = vec2(1, 1);
             var d_tex = vec2(0, 1);
 
-            Plane3D.divideQuad(a, b, c, d, a_tex, b_tex, c_tex, d_tex, 3);
+            Plane3D.divideQuad(a, b, c, d, a_tex, b_tex, c_tex, d_tex, 1);
 
 			Plane3D.shaderProgram = initShaders( gl, "./vshaders/vshaderPlane.glsl", "./fshaders/fshaderPlane.glsl");
 
@@ -156,7 +156,7 @@ class Plane3D extends Drawable{
 			gl.uniformMatrix4fv(Plane3D.uCameraMatrixShader, false, flatten(camera.cameraMatrix));
 			gl.uniformMatrix4fv(Plane3D.uProjectionMatrixShader, false, flatten(camera.projectionMatrix));
 			
-			console.log(camera1.projectionMatrix);
+			
 
             //gl.uniform4fv(Plane3D.uMatDiffColorShader, this.matDiffColor);
             gl.uniform4fv(Plane3D.uMatSpecColorShader, this.matSpecColor);

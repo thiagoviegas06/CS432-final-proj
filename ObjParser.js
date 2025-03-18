@@ -142,11 +142,17 @@ class ObjParser{
 
     }
 
+	isMirror(){
+		return false;
+	}
+
 
     draw(camera1) {
 		/*
 		TODO
 		*/
+
+		console.log("obj draw");
 
         gl.useProgram(ObjParser.shaderProgram);
 
