@@ -122,7 +122,7 @@ class Plane3D extends Drawable{
                 
             }
             
-            imagePlane.src = "./textures/256X grass block.png";
+            imagePlane.src = "./textures/grassArt.png";
         }
 		
 		constructor(tx,ty,tz,scale,rotX,rotY,rotZ,diffcolor,speccolor,sh){

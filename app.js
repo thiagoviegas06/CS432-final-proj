@@ -165,7 +165,7 @@ var hat;
 var mirror;
 var planes = [];
 
-var balloon;
+var balloon,bird;
 
 var then = 0.0;
 
@@ -199,7 +199,7 @@ window.onload = function init(){
 
 
     balloon = new ObjParser("./models/ballon/balloon.obj", 2,2,0, 0.0025, 0,0,0, diffcolor2,speccolor,shine/2);
-
+    bird = new ObjParser("./models/bird/BirdRender_obj.obj", -2, 2, 0, 0.125,0,0,0,diffcolor, speccolor, shine);
 
     //penguin = new SMFModel("./models/bound-cow.smf",diffcolor2,speccolor,shine);
 
@@ -230,7 +230,7 @@ window.onload = function init(){
     objects.push(balloon);
     objects.push(cylinder); 
     objects.push(hat);
-    
+    objects.push(bird);
     objects.push(mirror);
 
  
