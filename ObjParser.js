@@ -1,8 +1,8 @@
 class ObjParser{
 	constructor(fname,tx,ty,tz,sc,rotX, rotY, rotZ, diffcolor, speccolor, sh) {
-		ObjParser.matDiffColor = diffcolor;
-		ObjParser.matSpecColor = speccolor;
-		ObjParser.matAlpha = sh;
+		this.matDiffColor = diffcolor;
+		this.matSpecColor = speccolor;
+		this.matAlpha = sh;
 	
 		var f = loadFileAJAX(fname);
 		var lines = f.split('\n');
@@ -16,6 +16,8 @@ class ObjParser{
 		const finalVertices = [];
 		const finalNormals  = [];
 		const finalTextures = [];
+		this.vertices = [];
+		this.modelMatrix = -1;
 	
 		for (let line of lines) {
 			let strings = line.trim().split(/\s+/);
@@ -61,7 +63,7 @@ class ObjParser{
 		}
 	
 		// Store final buffers
-		ObjParser.vertices = finalVertices;
+		this.vertices = finalVertices;
 
 		//update model matrix:
 
@@ -72,73 +74,74 @@ class ObjParser{
 		let rz = rotateZ(rotZ);
 
 
-		ObjParser.modelMatrix = mult(t, mult(s, mult(rz, mult(ry, rx))));
+		this.modelMatrix = mult(t, mult(s, mult(rz, mult(ry, rx))));
 
-		ObjParser.initialize();
-		//ObjParser.initializeTexture(); 
+		this.initialize();
+		//this.initializeTexture(); 
 	}
 	
-    static vertices = [];
-    static normals  = [];
-	static textures = [];
-
-    static modelMatrix = -1;
     
-    static positionBuffer = -1;
-    static normalBuffer   = -1;
-	//static textureBuffer  = -1;
 
-    static aPositionShader = -1;
-	static aNormalShader = -1;
-	//static aTextCoordShader = -1;
-   
-    static uModelMatrixShader = -1;
-	static uCameraMatrixShader = -1;
-	static uProjectionMatrixShader = -1;
+    initialize(){
+		
+		this.normals  = [];
+		this.textures = [];
 
-	static uMatDiffColorShader = -1;
-    static uMatSpecColorShader = -1;
-    static uMatAlphaShader = -1;
+		
+		
+		this.positionBuffer = -1;
+		this.normalBuffer   = -1;
+		//this.textureBuffer  = -1;
 
-    static uLightDirectionShader = -1;
-    static uLightColorShader = -1;
+		this.aPositionShader = -1;
+		this.aNormalShader = -1;
+		//this.aTextCoordShader = -1;
+	
+		this.uModelMatrixShader = -1;
+		this.uCameraMatrixShader = -1;
+		this.uProjectionMatrixShader = -1;
 
-	//static texture = -1;
+		this.uMatDiffColorShader = -1;
+		this.uMatSpecColorShader = -1;
+		this.uMatAlphaShader = -1;
 
-    static initialize(){
-        ObjParser.shaderProgram = initShaders( gl, "./vshaders/vshader2.glsl", "./fshaders/fshader2.glsl");
+		this.uLightDirectionShader = -1;
+		this.uLightColorShader = -1;
+
+		//this.texture = -1;
+        this.shaderProgram = initShaders( gl, "./vshaders/vshader2.glsl", "./fshaders/fshader2.glsl");
 
         //Index Buffer
-        ObjParser.positionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, ObjParser.positionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, flatten(ObjParser.vertices), gl.STATIC_DRAW);
+        this.positionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(this.vertices), gl.STATIC_DRAW);
 
 		//Normal Buffer
-		ObjParser.normalBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, ObjParser.normalBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, flatten(ObjParser.vertices), gl.STATIC_DRAW);
+		this.normalBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(this.vertices), gl.STATIC_DRAW);
 
 		//Texture Buffer
 		/*
-		ObjParser.textureBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, ObjParser.textureBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, flatten(ObjParser.vertices), gl.STATIC_DRAW);*/
+		this.textureBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.textureBuffer);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(this.vertices), gl.STATIC_DRAW);*/
 	
-        ObjParser.aPositionShader  = gl.getAttribLocation( ObjParser.shaderProgram, "aPosition" );
-		ObjParser.aNormalShader    = gl.getAttribLocation( ObjParser.shaderProgram, "aNormal" );
-		//ObjParser.aTextCoordShader = gl.getAttribLocation( ObjParser.shaderProgram, "aTexCoord" );
+        this.aPositionShader  = gl.getAttribLocation( this.shaderProgram, "aPosition" );
+		this.aNormalShader    = gl.getAttribLocation( this.shaderProgram, "aNormal" );
+		//this.aTextCoordShader = gl.getAttribLocation( this.shaderProgram, "aTexCoord" );
 
-        ObjParser.uModelMatrixShader = gl.getUniformLocation( ObjParser.shaderProgram, "modelMatrix" );
-		ObjParser.uCameraMatrixShader = gl.getUniformLocation( ObjParser.shaderProgram, "cameraMatrix" );
-		ObjParser.uProjectionMatrixShader = gl.getUniformLocation( ObjParser.shaderProgram, "projectionMatrix" );
+        this.uModelMatrixShader = gl.getUniformLocation( this.shaderProgram, "modelMatrix" );
+		this.uCameraMatrixShader = gl.getUniformLocation( this.shaderProgram, "cameraMatrix" );
+		this.uProjectionMatrixShader = gl.getUniformLocation( this.shaderProgram, "projectionMatrix" );
 
-		ObjParser.uMatDiffColorShader = gl.getUniformLocation( ObjParser.shaderProgram, "matDiffColor" );
-		ObjParser.uMatSpecColorShader = gl.getUniformLocation( ObjParser.shaderProgram, "matSpecColor" );
-		ObjParser.uMatAlphaShader = gl.getUniformLocation( ObjParser.shaderProgram, "matAlpha" );
-		ObjParser.uTextureUnitShader = gl.getUniformLocation(ObjParser.shaderProgram, "textureSampler");
+		this.uMatDiffColorShader = gl.getUniformLocation( this.shaderProgram, "matDiffColor" );
+		this.uMatSpecColorShader = gl.getUniformLocation( this.shaderProgram, "matSpecColor" );
+		this.uMatAlphaShader = gl.getUniformLocation( this.shaderProgram, "matAlpha" );
+		this.uTextureUnitShader = gl.getUniformLocation(this.shaderProgram, "textureSampler");
 
-		ObjParser.uLightDirectionShader = gl.getUniformLocation( ObjParser.shaderProgram, "lightDirection" );
-		ObjParser.uLightColorShader = gl.getUniformLocation( ObjParser.shaderProgram, "lightColor" );
+		this.uLightDirectionShader = gl.getUniformLocation( this.shaderProgram, "lightDirection" );
+		this.uLightColorShader = gl.getUniformLocation( this.shaderProgram, "lightColor" );
 
     }
 
@@ -154,51 +157,51 @@ class ObjParser{
 
 		console.log("obj draw");
 
-        gl.useProgram(ObjParser.shaderProgram);
+        gl.useProgram(this.shaderProgram);
 
-        gl.bindBuffer( gl.ARRAY_BUFFER, ObjParser.positionBuffer);
-		gl.bindBuffer( gl.ARRAY_BUFFER, ObjParser.normalBuffer);
-		//gl.bindBuffer( gl.ARRAY_BUFFER, ObjParser.textureBuffer);
+        gl.bindBuffer( gl.ARRAY_BUFFER, this.positionBuffer);
+		gl.bindBuffer( gl.ARRAY_BUFFER, this.normalBuffer);
+		//gl.bindBuffer( gl.ARRAY_BUFFER, this.textureBuffer);
 
-        gl.vertexAttribPointer(ObjParser.aPositionShader, 3, gl.FLOAT, false, 0, 0 );
-		gl.vertexAttribPointer(ObjParser.aNormalShader, 3, gl.FLOAT, false, 0, 0 );
-		//gl.vertexAttribPointer(ObjParser.aTextCoordShader, 2, gl.FLOAT, false, 0 ,0 );
+        gl.vertexAttribPointer(this.aPositionShader, 3, gl.FLOAT, false, 0, 0 );
+		gl.vertexAttribPointer(this.aNormalShader, 3, gl.FLOAT, false, 0, 0 );
+		//gl.vertexAttribPointer(this.aTextCoordShader, 2, gl.FLOAT, false, 0 ,0 );
 		
-        gl.uniformMatrix4fv(ObjParser.uModelMatrixShader, false, flatten(ObjParser.modelMatrix));
+        gl.uniformMatrix4fv(this.uModelMatrixShader, false, flatten(this.modelMatrix));
 
 
 		console.log("OBJ MODEL MATRIX");
 		console.log(camera1.cameraMatrix);
 		console.log(camera1.projectionMatrix);
-        gl.uniformMatrix4fv(ObjParser.uCameraMatrixShader, false, flatten(camera1.cameraMatrix));
-        gl.uniformMatrix4fv(ObjParser.uProjectionMatrixShader, false, flatten(camera1.projectionMatrix));
+        gl.uniformMatrix4fv(this.uCameraMatrixShader, false, flatten(camera1.cameraMatrix));
+        gl.uniformMatrix4fv(this.uProjectionMatrixShader, false, flatten(camera1.projectionMatrix));
 
-		gl.uniform4fv(ObjParser.uMatDiffColorShader, ObjParser.matDiffColor);
-		gl.uniform4fv(ObjParser.uMatSpecColorShader, ObjParser.matSpecColor);
-		gl.uniform1f(ObjParser.uMatAlphaShader, ObjParser.matAlpha);
+		gl.uniform4fv(this.uMatDiffColorShader, this.matDiffColor);
+		gl.uniform4fv(this.uMatSpecColorShader, this.matSpecColor);
+		gl.uniform1f(this.uMatAlphaShader, this.matAlpha);
 
-		gl.uniform3fv(ObjParser.uLightDirectionShader, light1.direction);
-		gl.uniform4fv(ObjParser.uLightColorShader, light1.color);
+		gl.uniform3fv(this.uLightDirectionShader, light1.direction);
+		gl.uniform4fv(this.uLightColorShader, light1.color);
         
-        gl.enableVertexAttribArray(ObjParser.aPositionShader);
-		gl.enableVertexAttribArray(ObjParser.aNormalShader);
-		//gl.enableVertexAttribArray(ObjParser.aTextCoordShader);
+        gl.enableVertexAttribArray(this.aPositionShader);
+		gl.enableVertexAttribArray(this.aNormalShader);
+		//gl.enableVertexAttribArray(this.aTextCoordShader);
 
-        gl.drawArrays(gl.TRIANGLES, 0, ObjParser.vertices.length	);
+        gl.drawArrays(gl.TRIANGLES, 0, this.vertices.length	);
 
-        gl.disableVertexAttribArray(ObjParser.aPositionShader);
-		gl.disableVertexAttribArray(ObjParser.aNormalShader);
-		//gl.disableVertexAttribArray(ObjParser.aTextCoordShader);
+        gl.disableVertexAttribArray(this.aPositionShader);
+		gl.disableVertexAttribArray(this.aNormalShader);
+		//gl.disableVertexAttribArray(this.aTextCoordShader);
     }
 
 
 	updateObjPosition(tx,ty,tz){
 		let t = translate(tx,ty,tz);
-		ObjParser.modelMatrix = mult(t, ObjParser.modelMatrix);
+		this.modelMatrix = mult(t, this.modelMatrix);
 	}
 
 	getObjPosition(){
-		return ObjParser.modelMatrix;
+		return this.modelMatrix;
 	}
 
 
