@@ -1,13 +1,19 @@
 class TowerHat extends Drawable{
 	static vertexPositions = [];
+    static vertexTextureCoords = [];
 
     static shaderProgram = -1;
     static positionBuffer = -1;
+    static texture = -1;
     
     static aPositionShader = -1;
     static uModelMatrixShader = -1;
     static uCameraMatrixShader = -1;
     static uProjectionMatrixShader = -1;
+    
+    static textureBuffer = -1;
+    static aTextureCoordShader = -1;
+    static uTextureUnitShader = -1;
 
     static uMatDiffColorShader = -1;
     static uMatSpecColorShader = -1;
@@ -23,15 +29,31 @@ class TowerHat extends Drawable{
         let topCenter = vec3(0, yval, 0); 
         TowerHat.vertexPositions.push(topCenter);
     
-        // Generate vertices for the bottom and top circles
+        // Texture coordinate for the top center
+        TowerHat.vertexTextureCoords.push(vec2(0.5, 0.5)); 
+    
+        // Generate vertices for the bottom circle and sides
         for (let i = 0; i <= 2 * Math.PI; i += theta) {
             let x = radius * Math.cos(i);
             let z = radius * Math.sin(i);
     
             // Bottom circle vertices
             TowerHat.vertexPositions.push(vec3(x, -yval, z));
-        }
     
+            // Calculate texture coordinates for the bottom circle
+            let u = i / (2 * Math.PI);  
+            let v = 1;  
+    
+            // Store texture coordinates for the bottom
+            TowerHat.vertexTextureCoords.push(vec2(u, v));
+    
+            TowerHat.vertexPositions.push(topCenter);
+            TowerHat.vertexTextureCoords.push(vec2(u, 0)); 
+    
+            // Bottom vertex (same as bottom circle)
+            TowerHat.vertexPositions.push(vec3(x, -yval, z));
+            TowerHat.vertexTextureCoords.push(vec2(u, 1)); 
+        }
     }
 
     static divideQuad(a, b, c, d, depth) {
@@ -87,26 +109,51 @@ class TowerHat extends Drawable{
         }
         
     }
+
+    static initializeTexture() {
+        var image = new Image();
+        image.onload = function() {
+            TowerHat.texture = gl.createTexture();
+            gl.bindTexture(gl.TEXTURE_2D, TowerHat.texture);
+            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.REPEAT);
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.REPEAT);
+
+        }
+
+        image.src = "./textures/towerhat.png";
+    }
 		
 	static initialize() {
         TowerHat.calculateXZCoord(1.1, 10, 1);
+        TowerHat.initializeTexture();
         //TowerHat.divideQuad(a, b, c, d, 5);
 
-        TowerHat.shaderProgram = initShaders( gl, "./vshaders/vshader.glsl", "./fshaders/fshader.glsl");
+        TowerHat.shaderProgram = initShaders( gl, "./vshaders/vshaderPlane.glsl", "./fshaders/fshaderPlane.glsl");
 
         // Load the data into the GPU
         TowerHat.positionBuffer = gl.createBuffer();
         gl.bindBuffer( gl.ARRAY_BUFFER, TowerHat.positionBuffer);
         gl.bufferData( gl.ARRAY_BUFFER, flatten(TowerHat.vertexPositions), gl.STATIC_DRAW );
+
+        //load texture
+        TowerHat.textureBuffer = gl.createBuffer();
+        gl.bindBuffer( gl.ARRAY_BUFFER, TowerHat.textureBuffer);
+        gl.bufferData( gl.ARRAY_BUFFER, flatten(TowerHat.vertexTextureCoords), gl.STATIC_DRAW );
         
         // Associate our shader variables with our data buffer
         TowerHat.aPositionShader = gl.getAttribLocation( TowerHat.shaderProgram, "aPosition" );
-        
+        TowerHat.aTextureCoordShader = gl.getAttribLocation( TowerHat.shaderProgram, "aTextureCoord" );
+        TowerHat.uTextureUnitShader = gl.getUniformLocation(TowerHat.shaderProgram, "uTextureUnit");
+
         TowerHat.uModelMatrixShader = gl.getUniformLocation( TowerHat.shaderProgram, "modelMatrix" );
         TowerHat.uCameraMatrixShader = gl.getUniformLocation( TowerHat.shaderProgram, "cameraMatrix" );
         TowerHat.uProjectionMatrixShader = gl.getUniformLocation( TowerHat.shaderProgram, "projectionMatrix" );
 
-        TowerHat.uMatDiffColorShader = gl.getUniformLocation( TowerHat.shaderProgram, "matDiffColor" );
+        //TowerHat.uMatDiffColorShader = gl.getUniformLocation( TowerHat.shaderProgram, "matDiffColor" );
         TowerHat.uMatSpecColorShader = gl.getUniformLocation( TowerHat.shaderProgram, "matSpecColor" );
         TowerHat.uMatAlphaShader = gl.getUniformLocation( TowerHat.shaderProgram, "matAlpha" );
 
@@ -122,26 +169,37 @@ class TowerHat extends Drawable{
     }
     
     draw(camera) {
+        if(TowerHat.texture === -1)
+            return;
         
         gl.useProgram(TowerHat.shaderProgram);
         
         gl.bindBuffer( gl.ARRAY_BUFFER, TowerHat.positionBuffer);
         gl.vertexAttribPointer(TowerHat.aPositionShader, 3, gl.FLOAT, false, 0, 0 );
-        
+
+        gl.bindBuffer( gl.ARRAY_BUFFER, TowerHat.textureBuffer);
+        gl.vertexAttribPointer(TowerHat.aTextureCoordShader, 2, gl.FLOAT, false, 0, 0 );
+       
+        gl.activeTexture(gl.TEXTURE0);
+        gl.bindTexture(gl.TEXTURE_2D, TowerHat.texture);
+        gl.uniform1i(TowerHat.uTextureUnitShader, 0);
+
         gl.uniformMatrix4fv(TowerHat.uModelMatrixShader, false, flatten(this.modelMatrix));
         gl.uniformMatrix4fv(TowerHat.uCameraMatrixShader, false, flatten(camera.cameraMatrix));
         gl.uniformMatrix4fv(TowerHat.uProjectionMatrixShader, false, flatten(camera.projectionMatrix));
 
-        gl.uniform4fv(TowerHat.uMatDiffColorShader, this.matDiffColor);
+        //gl.uniform4fv(TowerHat.uMatDiffColorShader, this.matDiffColor);
         gl.uniform4fv(TowerHat.uMatSpecColorShader, this.matSpecColor);
         gl.uniform1f(TowerHat.uMatAlphaShader, this.matAlpha);
 
         gl.uniform3fv(TowerHat.uLightDirectionShader, light1.direction);
         gl.uniform4fv(TowerHat.uLightColorShader, light1.color);
 
-        gl.enableVertexAttribArray(TowerHat.aPositionShader);    
+        gl.enableVertexAttribArray(TowerHat.aPositionShader);
+        gl.enableVertexAttribArray(TowerHat.aTextureCoordShader);    
         gl.drawArrays(gl.TRIANGLE_FAN, 0, TowerHat.vertexPositions.length);
         gl.disableVertexAttribArray(TowerHat.aPositionShader);    
+        gl.disableVertexAttribArray(TowerHat.aTextureCoordShader);
     }
 }
 
