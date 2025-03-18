@@ -9,7 +9,6 @@ in vec3 R;
 in vec2 vTexCoord; 
 
 uniform vec4 lightColor;  
-uniform vec4 matDiffColor; 
 uniform vec4 matSpecColor; 
 
 uniform float matAlpha;    

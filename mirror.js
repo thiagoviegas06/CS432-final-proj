@@ -15,7 +15,7 @@ class Mirror extends Drawable{
     static uCameraMatrixShader = -1;
     static uProjectionMatrixShader = -1;
 
-    static uMatDiffColorShader = -1;
+    //static uMatDiffColorShader = -1;
     static uMatSpecColorShader = -1;
     static uMatAlphaShader = -1;
 
@@ -51,7 +51,7 @@ class Mirror extends Drawable{
     }
 
     static initialize() {
-        Mirror.initializeTexture();
+        //Mirror.initializeTexture();
         Mirror.shaderProgram = initShaders( gl, "./vshaders/mirrorVshader.glsl", "./fshaders/mirrorFShader.glsl");
         Mirror.initializeTexture();
 
@@ -60,10 +60,7 @@ class Mirror extends Drawable{
         gl.bindBuffer( gl.ARRAY_BUFFER, Mirror.positionBuffer);
         gl.bufferData( gl.ARRAY_BUFFER, flatten(Mirror.vertexPositions), gl.STATIC_DRAW );
 
-        Mirror.frameBuffer = gl.createFramebuffer();
-        Mirror.frameBuffer.width = Mirror.texsize;
-        Mirror.frameBuffer.height = Mirror.texsize;
-
+        
         /*
         Mirror.textureBuffer = gl.createTexture();
         gl.bindBuffer( gl.ARRAY_BUFFER, Mirror.textureBuffer);
@@ -77,7 +74,7 @@ class Mirror extends Drawable{
         Mirror.uCameraMatrixShader = gl.getUniformLocation( Mirror.shaderProgram, "cameraMatrix" );
         Mirror.uProjectionMatrixShader = gl.getUniformLocation( Mirror.shaderProgram, "projectionMatrix" );
         
-        Mirror.uMatDiffColorShader = gl.getUniformLocation( Mirror.shaderProgram, "matDiffColor" );
+        //Mirror.uMatDiffColorShader = gl.getUniformLocation( Mirror.shaderProgram, "matDiffColor" );
         Mirror.uMatSpecColorShader = gl.getUniformLocation( Mirror.shaderProgram, "matSpecColor" );
         Mirror.uMatAlphaShader = gl.getUniformLocation( Mirror.shaderProgram, "matAlpha" );
 
@@ -89,21 +86,27 @@ class Mirror extends Drawable{
     static initializeTexture() {
         Mirror.texture = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, Mirror.texture);
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, Mirror.texsize, Mirror.texsize, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
-
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        
+        
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, Mirror.texsize, Mirror.texsize, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
+
+        Mirror.frameBuffer = gl.createFramebuffer();
+        Mirror.frameBuffer.width = Mirror.texsize;
+        Mirror.frameBuffer.height = Mirror.texsize;
 
     }
 
     static renderBuffer(camera){
 
-        var origu   = vec3(camera.u[0], camera.u[1], camera.u[2]);
-        var origv   = vec3(camera.v[0], camera.v[1], camera.v[2]);
-        var orign   = vec3(camera.n[0], camera.n[1], camera.n[2]);
-        var origVRP = vec3(camera.vrp[0], camera.vrp[1], camera.vrp[2]);
+        var origu   = vec3(camera.u);
+        var origv   = vec3(camera.v);
+        var orign   = vec3(camera.n);
+        var origVRP = vec3(camera.vrp);
+        var origProjectionMat = camera.projectionMatrix;
 
         var viewportParameters = gl.getParameter(gl.VIEWPORT);
         gl.viewport(0, 0, Mirror.texsize, Mirror.texsize);
@@ -119,9 +122,9 @@ class Mirror extends Drawable{
         camera.u = vec3(-1, 0, 0);
         camera.v = vec3(0, -1, 0);
         camera.n = vec3(0, 0, 1);
-
-        gl.framebufferTexture2D (gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, Mirror.texture, 0);
         gl.bindTexture(gl.TEXTURE_2D, Mirror.texture);
+        gl.framebufferTexture2D (gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, Mirror.texture, 0);
+        
 
         camera.updateCameraMatrix();
         console.log("CAMERA MATRIX IN MIRROR");
@@ -133,7 +136,7 @@ class Mirror extends Drawable{
 
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         for(var i = 0; i < objects.length; i++){
-            if(objects[i] != this){
+            if(objects[i].type !== this.type){
                 objects[i].draw(camera);
             }
         }
@@ -142,8 +145,9 @@ class Mirror extends Drawable{
         camera.v = origv;
         camera.n = orign;
         camera.vrp = origVRP;
-
-        camera.projectionMatrix = perspective(90.0, 1.0, 0.1, 100);
+        camera.projectionMatrix = origProjectionMat;
+        camera.updateCameraMatrix();
+        //camera.projectionMatrix = perspective(90.0, 1.0, 0.1, 100);
         gl.viewport(viewportParameters[0], viewportParameters[1], viewportParameters[2], viewportParameters[3]);
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
@@ -170,7 +174,7 @@ class Mirror extends Drawable{
         gl.uniformMatrix4fv(Mirror.uCameraMatrixShader, false, flatten(camera.cameraMatrix));
         gl.uniformMatrix4fv(Mirror.uProjectionMatrixShader, false, flatten(camera.projectionMatrix));
 
-        gl.uniform4fv(Mirror.uMatDiffColorShader, this.matDiffColor);
+        //gl.uniform4fv(Mirror.uMatDiffColorShader, this.matDiffColor);
         gl.uniform4fv(Mirror.uMatSpecColorShader, this.matSpecColor);
         gl.uniform1f(Mirror.uMatAlphaShader, this.matAlpha);
 
@@ -179,7 +183,7 @@ class Mirror extends Drawable{
         gl.uniform4fv(Mirror.uLightColorShader, light1.color);
 
         // Draw the object
-        gl.drawArrays(gl.TRIANGLE_FAN, 0, Mirror.vertexPositions.length / 3);
+        gl.drawArrays(gl.TRIANGLE_FAN, 0, Mirror.vertexPositions.length);
     }
 
 }
