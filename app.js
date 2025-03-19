@@ -178,14 +178,14 @@ function getRandomArbitrary(min, max) {
 
 
 function birdFlight(deltaTime) {
-    const speed = getRandomArbitrary(0.4, 0.65);
+    
     const threshold = 0.5;
     const separationDistance = 1.0;
     const noiseStrength = 0.025;
 
     for (let i = 0; i < flock.length; i++) {
         let bird = flock[i];
-
+        let speed = getRandomArbitrary(0.4, 0.65);
         let curPos = bird.getObjPosition();
         let curPosXYZ = vec3(curPos[0][3], curPos[1][3], curPos[2][3]);
         let diff = subtract(curDest, curPosXYZ);
