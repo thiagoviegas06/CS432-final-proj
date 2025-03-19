@@ -171,9 +171,14 @@ function balloonAnimation(deltaTime) {
 let cur = 0; // Current destination index (shared across all birds)
 let curDest = destinations[cur]; // Current destination (shared across all birds)
 
+function getRandomArbitrary(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+  
+
 
 function birdFlight(deltaTime) {
-    const speed = 0.5;
+    const speed = getRandomArbitrary(0.4, 0.65);
     const threshold = 0.5;
     const separationDistance = 1.0;
     const noiseStrength = 0.025;
