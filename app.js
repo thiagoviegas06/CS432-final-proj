@@ -51,6 +51,7 @@ class Camera{
 
 var camera1 = new Camera(vec3(0,0.25,5), vec3(1,0,0), normalize(vec3(0,1,0)), normalize(vec3(0,0,1)));
 var camera2 = new Camera(vec3(0,5,1), vec3(1,0,0), normalize(vec3(0,0,-1)), normalize(vec3(0,1,0)));
+var camera3 = new Camera(vec3(5,0,0), vec3(1,0,0), normalize(vec3(0,1,0)), normalize(vec3(-1,0,0)));
 
 var light1 = new Light(vec3(2,2,2), vec3(-1,-1,-1), vec4(1.0, 0.85, 0.6, 1), 0, 90, 1);
 
@@ -178,7 +179,6 @@ function getRandomArbitrary(min, max) {
 
 
 function birdFlight(deltaTime) {
-    
     const threshold = 0.5;
     const separationDistance = 1.0;
     const noiseStrength = 0.025;
@@ -221,13 +221,33 @@ function birdFlight(deltaTime) {
         let velocity = subtract(newPos, curPosXYZ);
         let forward = normalize(velocity);
 
-       
-        let rx = -Math.atan2(forward[1], Math.sqrt(forward[0] * forward[0] + forward[2] * forward[2])) + (Math.random() - 0.5) * noiseStrength;
-        let ry = Math.atan2(forward[0], forward[2]) + (Math.random() - 0.5) * noiseStrength;
-
+        let rotation = lookAt(curPosXYZ, curDest, vec3(0, 1, 0));
+        let angles = extractRotationAngles(rotation);
         
-        bird.updateModelMatrix(newPos[0], newPos[1], newPos[2], 0.125, rx, ry, 0);
+        bird.updateModelMatrix(newPos[0], newPos[1], newPos[2], 0.125, angles.rx *2*Math.PI, angles.ry*2*Math.PI, angles.rz*2*Math.PI);
+        
     }
+}
+
+function extractRotationAngles(matrix) {
+    
+    let right = vec3(matrix[0][0], matrix[0][1], matrix[0][2]); // First row
+    let up = vec3(matrix[1][0], matrix[1][1], matrix[1][2]);    // Second row
+    let fwd = vec3(-matrix[2][0], -matrix[2][1], -matrix[2][2]); // Third row (negated)
+
+    // Calculate yaw (ry) from the forward vector
+    let ry = Math.atan2(fwd[0], fwd[2]);
+    console.log("ry", ry);
+
+    // Calculate pitch (rx) from the fwd vector
+    let rx = -Math.atan2(fwd[1], Math.sqrt(fwd[0] * fwd[0] + fwd[2] * fwd[2]));
+    console.log("rx", rx);
+
+    // Calculate roll (rz) from the right and up vectors
+    let rz = Math.atan2(right[1], up[1]);
+    console.log("rz", rz);
+
+    return { rx, ry, rz };
 }
 
 function separation(bird, flock, separationDistance) {
@@ -277,6 +297,10 @@ var cylinder;
 var hat;
 var mirror;
 var planes = [];
+
+var house;
+var tree1;
+var tree2;
 
 var balloon,bird;
 
@@ -338,18 +362,28 @@ window.onload = function init(){
             objects.push(bird);
         }
     }
-    
 
+    for(let i = 0; i < 20; i++){
+        let x = getRandomArbitrary(-5,-2);
+        let z = getRandomArbitrary(-5,5);
+        let x2 = getRandomArbitrary(5,2);
+        tree1 = new ObjParser("./models/Palm/Palm_01.obj", x,-0.1,z,0.025,0,0,0,diffcolor,speccolor,shine);
+        tree2 = new ObjParser("./models/Palm/Palm_01.obj", x2,-0.1,z,0.025,0,0,0,diffcolor,speccolor,shine);
+
+        objects.push(tree1);
+        objects.push(tree2);
+    }
 
     hat = new TowerHat(0,1.75,0,0.5,0,0,0,diffcolor2, speccolor, shine);
     mirror = new Mirror(1,0.25,1,0.5,0,0,0,diffcolor2,speccolor,shine);
-
+    tree = new ObjParser("./models/Palm/Palm_01.obj", -2,0,0,0.025,0,0,0,diffcolor,speccolor,shine);
    
     //objects.push(plane);
     objects.push(balloon);
     objects.push(cylinder); 
     objects.push(hat);
     //objects.push(bird);
+    //objects.push(house);
     objects.push(mirror);
 
  
