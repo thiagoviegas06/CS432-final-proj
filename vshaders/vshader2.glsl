@@ -1,7 +1,7 @@
 #version 300 es
 in vec3 aPosition;
 in vec3 aNormal; 
-//in vec2 aTexCoord; 
+in vec2 aTexCoord; 
 
 uniform mat4 modelMatrix;
 uniform mat4 cameraMatrix;
@@ -11,7 +11,7 @@ uniform vec3 lightDirection;
 out vec3 L; 
 out vec3 V; 
 out vec3 N; 
-//out vec2 texCoord; 
+out vec2 texCoord; 
 
 void main()
 {
@@ -27,5 +27,5 @@ void main()
 
     V = normalize(vec3(0,0,0) - pos);
    
-    //texCoord = aTexCoord;
+    texCoord = aTexCoord;
 }

@@ -242,7 +242,7 @@ class Cylinder3D extends Drawable{
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, Cylinder3D.texture);
         gl.uniform1i(Cylinder3D.uTextureUnitShader,0);
-        console.log(camera1.projectionMatrix);
+        //console.log(camera1.projectionMatrix);
 
         gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, Cylinder3D.indexBuffer);
 

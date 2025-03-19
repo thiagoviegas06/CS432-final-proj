@@ -4,15 +4,15 @@ precision mediump float;
 in vec3 L; 
 in vec3 V; 
 in vec3 N; 
-//in vec2 texCoord; 
+in vec2 texCoord; 
 
 uniform vec4 lightColor;  
-uniform vec4 matDiffColor; 
+//uniform vec4 matDiffColor; 
 uniform vec4 matSpecColor; 
 
 uniform float matAlpha;    
 
-//uniform sampler2D textureSampler; 
+uniform sampler2D textureSampler; 
 
 out vec4 fcolor;
 
@@ -30,7 +30,7 @@ void main()
 
     // Diffuse lighting
     float Kd = max(dot(lightDir, norm), 0.0);
-    vec4 diffuse = Kd * lightColor * matDiffColor;
+    vec4 diffuse = Kd * lightColor * texture(textureSampler, texCoord);
 
     // Specular lighting
     float Ks = pow ( max(dot(R, viewDir), 0.0), matAlpha);

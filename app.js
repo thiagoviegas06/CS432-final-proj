@@ -56,9 +56,9 @@ var camera3 = new Camera(vec3(5,0,0), vec3(1,0,0), normalize(vec3(0,1,0)), norma
 var light1 = new Light(vec3(2,2,2), vec3(-1,-1,-1), vec4(1.0, 0.85, 0.6, 1), 0, 90, 1);
 
 
-console.log(light1);
-console.log("CAMERA 1");
-console.log(camera1.cameraMatrix);
+//console.log(light1);
+//console.log("CAMERA 1");
+//console.log(camera1.cameraMatrix);
 
 class Drawable{
     
@@ -80,7 +80,7 @@ class Drawable{
     }
 
     updateT(deltaX, deltaY, deltaZ) {
-        console.log("Updating translation:", deltaX, deltaY, deltaZ);
+        //console.log("Updating translation:", deltaX, deltaY, deltaZ);
     
         if (isNaN(deltaX) || isNaN(deltaY) || isNaN(deltaZ)) {
             console.error("NaN detected in updateT inputs!");
@@ -237,15 +237,15 @@ function extractRotationAngles(matrix) {
 
     // Calculate yaw (ry) from the forward vector
     let ry = Math.atan2(fwd[0], fwd[2]);
-    console.log("ry", ry);
+    //console.log("ry", ry);
 
     // Calculate pitch (rx) from the fwd vector
     let rx = -Math.atan2(fwd[1], Math.sqrt(fwd[0] * fwd[0] + fwd[2] * fwd[2]));
-    console.log("rx", rx);
+    //console.log("rx", rx);
 
     // Calculate roll (rz) from the right and up vectors
     let rz = Math.atan2(right[1], up[1]);
-    console.log("rz", rz);
+    //console.log("rz", rz);
 
     return { rx, ry, rz };
 }
@@ -255,18 +255,18 @@ function separation(bird, flock, separationDistance) {
     let count = 0; 
     let positionMatrix = bird.getObjPosition();
     let position = vec3(positionMatrix[0][3], positionMatrix[1][3], positionMatrix[2][3]);
-    console.log("bird position");
-    console.log(position);
+    //console.log("bird position");
+    //console.log(position);
 
     for (let other of flock) {
         if (other !== bird) { 
             let otherBirdPos = other.getObjPosition();
             let otherPosition = vec3(otherBirdPos[0][3], otherBirdPos[1][3], otherBirdPos[2][3]);
-            console.log("other position");
-            console.log(otherPosition);
+            //console.log("other position");
+            //console.log(otherPosition);
             let distance = length(subtract(position, otherPosition));
 
-            console.log(distance); 
+           // console.log(distance); 
 
             if (distance > 0 && distance < separationDistance) {
                 
@@ -335,7 +335,7 @@ window.onload = function init(){
     var rotY = 57*Math.PI ;
 
 
-    balloon = new ObjParser("./models/ballon/balloon.obj", 2,2,0, 0.0025, 0,0,0, diffcolor2,speccolor,shine/2);
+    balloon = new ObjParser("./models/ballon/balloon.obj", 2,2,0, 0.0025, 0,0,0, diffcolor2,speccolor,shine/2, "./models/ballon/html-color-codes-color-palette-generators-hero.jpg");
     
 
     cylinder = new Cylinder3D(0,0.5,0,0.5,0,0,0,diffcolor2,speccolor,shine); 
@@ -357,7 +357,7 @@ window.onload = function init(){
 
     for(let b = 0; b < 5; b++){
         for(let i = 0; i < 2; i++){
-            bird = new ObjParser("./models/bird/BirdRender_obj.obj", -5 - b, 3, i, 0.125,0,0,0,diffcolor, speccolor, shine);
+            bird = new ObjParser("./models/bird/BirdRender_obj.obj", -5 - b, 3, i, 0.125,0,0,0,diffcolor, speccolor, shine, "./models/bird/SparrowAO.png");
             flock.push(bird);
             objects.push(bird);
         }
@@ -367,8 +367,8 @@ window.onload = function init(){
         let x = getRandomArbitrary(-5,-2);
         let z = getRandomArbitrary(-5,5);
         let x2 = getRandomArbitrary(5,2);
-        tree1 = new ObjParser("./models/Palm/Palm_01.obj", x,-0.1,z,0.025,0,0,0,diffcolor,speccolor,shine);
-        tree2 = new ObjParser("./models/Palm/Palm_01.obj", x2,-0.1,z,0.025,0,0,0,diffcolor,speccolor,shine);
+        tree1 = new ObjParser("./models/Palm/Palm_01.obj", x,-0.1,z,0.025,0,0,0,diffcolor,speccolor,shine, "./models/Palm/VL1X8_002.png");
+        tree2 = new ObjParser("./models/Palm/Palm_01.obj", x2,-0.1,z,0.025,0,0,0,diffcolor,speccolor,shine, "./models/Palm/VL1X8_002.png");
 
         objects.push(tree1);
         objects.push(tree2);
@@ -376,7 +376,7 @@ window.onload = function init(){
 
     hat = new TowerHat(0,1.75,0,0.5,0,0,0,diffcolor2, speccolor, shine);
     mirror = new Mirror(1,0.25,1,0.5,0,0,0,diffcolor2,speccolor,shine);
-    tree = new ObjParser("./models/Palm/Palm_01.obj", -2,0,0,0.025,0,0,0,diffcolor,speccolor,shine);
+    tree = new ObjParser("./models/Palm/Palm_01.obj", -2,0,0,0.025,0,0,0,diffcolor,speccolor,shine, "./models/Palm/VL1X8_002.png");
    
     //objects.push(plane);
     objects.push(balloon);
@@ -481,20 +481,20 @@ function myfunction(event){
                 let camera2Position = camera2.vrp;
 
                 tri.updateT(camera2Position[0],camera2Position[1],camera2Position[2]);
-                console.log("switching to camera 2");
+                //console.log("switching to camera 2");
             }else{
                 currentCamera = camera1;
                 let camera1Position = camera1.vrp;
                 tri.updateT(camera1Position[0],camera1Position[1],camera1Position[2]);
-                console.log("switching to camera 1");
+                //console.log("switching to camera 1");
             }
             
             break;
         case "KeyP":
             if(currentCamera === camera1){
                 tri.updateT(0,0,1);
-                console.log("this is tri mondels\n"); 
-                console.log(tri.modelMatrix);
+                //console.log("this is tri mondels\n"); 
+                //console.log(tri.modelMatrix);
                 
             }
             break;
