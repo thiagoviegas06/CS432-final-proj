@@ -39,10 +39,6 @@ class Mirror extends Drawable{
         Mirror.tx = tx;
         Mirror.ty = ty;
         Mirror.tz = tz;
-        console.log("MIRROR CONSTRUCTOR");
-        console.log(Mirror.tx);
-        console.log(Mirror.ty);
-        console.log(Mirror.tz);
 
 
         if(Mirror.shaderProgram == -1)
@@ -74,7 +70,7 @@ class Mirror extends Drawable{
         Mirror.aPositionShader = gl.getAttribLocation( Mirror.shaderProgram, "aPosition" );
 
         Mirror.uTextureUnitShader = gl.getUniformLocation(Mirror.shaderProgram, "uTextureUnit");
-        console.log("Uniform location:", Mirror.uTextureUnitShader);
+
 
         Mirror.uModelMatrixShader = gl.getUniformLocation( Mirror.shaderProgram, "modelMatrix" );
         Mirror.uCameraMatrixShader = gl.getUniformLocation( Mirror.shaderProgram, "cameraMatrix" );
@@ -132,13 +128,13 @@ class Mirror extends Drawable{
         
         camera.updateCameraMatrix();
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-        console.log("CAMERA MATRIX IN MIRROR:", camera.cameraMatrix);
+
     
         // Draw objects into the framebuffer
         for (var i = 1; i < objects.length; i++) {
-            console.log("current object type:", objects[i]);
+           
             if (!objects[i].isMirror()) {
-                console.log(`Drawing object --- mirror ${i}:`, objects[i]);
+               
                 objects[i].draw(camera);
             }
         }
@@ -155,7 +151,7 @@ class Mirror extends Drawable{
         gl.bindFramebuffer(gl.FRAMEBUFFER, null);
         gl.depthMask(true);
 
-        console.log("FRAMEBUFFER RENDERED");
+       
         return 1;
     }
 
@@ -168,14 +164,14 @@ class Mirror extends Drawable{
             return; 
         }
 
-        console.log("passed");
+        
         gl.useProgram(Mirror.shaderProgram);
         
         gl.activeTexture(gl.TEXTURE0);
         gl.bindTexture(gl.TEXTURE_2D, Mirror.texture);
 
         gl.uniform1i(Mirror.uTextureUnitShader, 0);
-        console.log(Mirror.uTextureUnitShader); 
+
 
         gl.bindBuffer(gl.ARRAY_BUFFER, Mirror.positionBuffer);
         gl.vertexAttribPointer(Mirror.aPositionShader, 3, gl.FLOAT, false, 0, 0);

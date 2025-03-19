@@ -155,8 +155,6 @@ class ObjParser{
 		TODO
 		*/
 
-		console.log("obj draw");
-
         gl.useProgram(this.shaderProgram);
 
         gl.bindBuffer( gl.ARRAY_BUFFER, this.positionBuffer);
@@ -169,10 +167,6 @@ class ObjParser{
 		
         gl.uniformMatrix4fv(this.uModelMatrixShader, false, flatten(this.modelMatrix));
 
-
-		console.log("OBJ MODEL MATRIX");
-		console.log(camera1.cameraMatrix);
-		console.log(camera1.projectionMatrix);
         gl.uniformMatrix4fv(this.uCameraMatrixShader, false, flatten(camera1.cameraMatrix));
         gl.uniformMatrix4fv(this.uProjectionMatrixShader, false, flatten(camera1.projectionMatrix));
 
@@ -204,6 +198,17 @@ class ObjParser{
 		return this.modelMatrix;
 	}
 
+	updateModelMatrix(tx, ty, tz, sc, modelRotationX, modelRotationY, modelRotationZ){
+        let t = translate(tx, ty, tz);
+
+    	let s = scale(sc,sc,sc);
+
+    	let rx = rotateX(modelRotationX);
+    	let ry = rotateY(modelRotationY);
+    	let rz = rotateZ(modelRotationZ);
+
+		this.modelMatrix = mult(t,mult(s,mult(rz,mult(ry,rx))));
+    }
 
 
 }

@@ -122,10 +122,24 @@ class Drawable{
         return false;
     }
 }
+
 let sign = 1; // Declare sign globally
 let up = 0, down = 0;
 let time = 0;
 let realtime = 0;
+
+let flock = [];
+let destinations = [];
+const radius = 5; 
+const height = 5;  
+const numPoints = 12; 
+
+for (let i = 0; i < numPoints; i++) {
+    let angle = (i / numPoints) * 2 * Math.PI; // Angle in radians
+    let x = radius * Math.cos(angle);
+    let z = radius * Math.sin(angle);
+    destinations.push(vec3(x, height, z));
+}
 
 function balloonAnimation(deltaTime) {
     time += deltaTime ;
@@ -152,6 +166,100 @@ function balloonAnimation(deltaTime) {
     //console.log("y", y);    
 
     balloon.updateObjPosition(x, y, z);
+}
+
+let cur = 0; // Current destination index (shared across all birds)
+let curDest = destinations[cur]; // Current destination (shared across all birds)
+
+
+function birdFlight(deltaTime) {
+    const speed = 0.5;
+    const threshold = 0.5;
+    const separationDistance = 1.0;
+    const noiseStrength = 0.025;
+
+    for (let i = 0; i < flock.length; i++) {
+        let bird = flock[i];
+
+        let curPos = bird.getObjPosition();
+        let curPosXYZ = vec3(curPos[0][3], curPos[1][3], curPos[2][3]);
+        let diff = subtract(curDest, curPosXYZ);
+
+        if (length(diff) < threshold) {
+            cur++;
+            if (cur >= destinations.length) {
+                cur = 0;
+            }
+            curDest = destinations[cur];
+            diff = subtract(curDest, curPosXYZ);
+        }
+
+        
+        let dir = normalize(diff);
+        let separationForce = separation(bird, flock, separationDistance);
+
+        
+        let desiredDirection = add(dir, separationForce);
+        dir = normalize(desiredDirection);
+
+        let noisyDir = vec3(
+            dir[0] + (Math.random() - 0.5) * noiseStrength,
+            dir[1] + (Math.random() - 0.5) * noiseStrength,
+            dir[2] + (Math.random() - 0.5) * noiseStrength
+        );
+        noisyDir = normalize(noisyDir);
+        
+
+        let moveFactor = speed * deltaTime;
+        let move = vec3(noisyDir[0] * moveFactor, dir[1] * moveFactor, noisyDir[2] * moveFactor);
+        let newPos = add(curPosXYZ, move);
+        let velocity = subtract(newPos, curPosXYZ);
+        let forward = normalize(velocity);
+
+       
+        let rx = -Math.atan2(forward[1], Math.sqrt(forward[0] * forward[0] + forward[2] * forward[2])) + (Math.random() - 0.5) * noiseStrength;
+        let ry = Math.atan2(forward[0], forward[2]) + (Math.random() - 0.5) * noiseStrength;
+
+        
+        bird.updateModelMatrix(newPos[0], newPos[1], newPos[2], 0.125, rx, ry, 0);
+    }
+}
+
+function separation(bird, flock, separationDistance) {
+    let steer = vec3(0, 0, 0); 
+    let count = 0; 
+    let positionMatrix = bird.getObjPosition();
+    let position = vec3(positionMatrix[0][3], positionMatrix[1][3], positionMatrix[2][3]);
+    console.log("bird position");
+    console.log(position);
+
+    for (let other of flock) {
+        if (other !== bird) { 
+            let otherBirdPos = other.getObjPosition();
+            let otherPosition = vec3(otherBirdPos[0][3], otherBirdPos[1][3], otherBirdPos[2][3]);
+            console.log("other position");
+            console.log(otherPosition);
+            let distance = length(subtract(position, otherPosition));
+
+            console.log(distance); 
+
+            if (distance > 0 && distance < separationDistance) {
+                
+                let diff = subtract(position, otherPosition);
+                diff = normalize(diff);
+                let updateDiff = vec3((1/distance)* diff[0],(1/distance)* diff[1], (1/distance)* diff[2]); 
+                steer = add(steer, updateDiff);
+                count++;
+            }
+        }
+    }
+
+    // Average the separation force
+    if (count > 0) {
+        steer = vec3(steer[0] * (1/count), steer[1] * (1/count), steer[2] * (1/count));
+    }
+
+    return steer;
 }
 
 
@@ -199,9 +307,7 @@ window.onload = function init(){
 
 
     balloon = new ObjParser("./models/ballon/balloon.obj", 2,2,0, 0.0025, 0,0,0, diffcolor2,speccolor,shine/2);
-    bird = new ObjParser("./models/bird/BirdRender_obj.obj", -2, 2, 0, 0.125,0,0,0,diffcolor, speccolor, shine);
-
-    //penguin = new SMFModel("./models/bound-cow.smf",diffcolor2,speccolor,shine);
+    
 
     cylinder = new Cylinder3D(0,0.5,0,0.5,0,0,0,diffcolor2,speccolor,shine); 
     //plane = new Plane3D(0,-0.1,0,2,0,0,0, diffcolor,speccolor, shine);
@@ -219,6 +325,14 @@ window.onload = function init(){
     for(let i = 0; i < planes.length; i++){
         objects.push(planes[i]);
     }
+
+    for(let b = 0; b < 5; b++){
+        for(let i = 0; i < 2; i++){
+            bird = new ObjParser("./models/bird/BirdRender_obj.obj", -5 - b, 3, i, 0.125,0,0,0,diffcolor, speccolor, shine);
+            flock.push(bird);
+            objects.push(bird);
+        }
+    }
     
 
 
@@ -230,7 +344,7 @@ window.onload = function init(){
     objects.push(balloon);
     objects.push(cylinder); 
     objects.push(hat);
-    objects.push(bird);
+    //objects.push(bird);
     objects.push(mirror);
 
  
@@ -358,7 +472,7 @@ function render(now){
     var deltaTime = now - then;
     then = now;
 
-    //balloonAnimation(deltaTime);
+    
 
 
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -369,6 +483,9 @@ function render(now){
         }
         
     }
+
+    balloonAnimation(deltaTime);
+    birdFlight(deltaTime); 
     
 	
    
