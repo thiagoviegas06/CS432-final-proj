@@ -364,7 +364,7 @@ window.onload = function init(){
         }
     }
 
-    for(let i = 0; i < 20; i++){
+    for(let i = 0; i < 40; i++){
         let x = getRandomArbitrary(-5,-2);
         let z = getRandomArbitrary(-5,5);
         let x2 = getRandomArbitrary(5,2);
