@@ -296,6 +296,7 @@ var goal;
 var cylinder;
 var hat;
 var mirror;
+var mirrorFrame;
 var planes = [];
 
 var house;
@@ -375,7 +376,8 @@ window.onload = function init(){
     }
 
     hat = new TowerHat(0,1.75,0,0.5,0,0,0,diffcolor2, speccolor, shine);
-    mirror = new Mirror(1,0.25,1,0.5,0,0,0,diffcolor2,speccolor,shine);
+    mirror = new Mirror(1,0.5,0.95,0.5,-5,0,0,diffcolor2,speccolor,shine);
+    mirrorFrame = new ObjParser("./models/frame/SM_frame_01.obj", 1,0.0,0.9,0.05,0,0,0,diffcolor2,speccolor,shine, "./models/frame/FrameTexture.png");
     tree = new ObjParser("./models/Palm/Palm_01.obj", -2,0,0,0.025,0,0,0,diffcolor,speccolor,shine, "./models/Palm/VL1X8_002.png");
    
     //objects.push(plane);
@@ -385,6 +387,7 @@ window.onload = function init(){
     //objects.push(bird);
     //objects.push(house);
     objects.push(mirror);
+    objects.push(mirrorFrame);
 
  
     requestAnimationFrame(render);

@@ -80,7 +80,15 @@ class ObjParser{
 
 						finalVertices.push(objPositions[vIndex]);
 						finalTextures.push(objTexcoords[vtIndex]);
-						finalNormals.push(objNormals[vnIndex]);
+						if(objNormals.length === 0)
+						{
+							finalNormals.push(objPositions[vIndex]);
+						}
+						else
+						{
+							finalNormals.push(objNormals[vnIndex]);
+						}
+						
 					}
 					break;
 			}
@@ -123,7 +131,7 @@ class ObjParser{
 		//Normal Buffer
 		this.normalBuffer = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, this.normalBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, flatten(this.vertices), gl.STATIC_DRAW);
+        gl.bufferData(gl.ARRAY_BUFFER, flatten(this.normals), gl.STATIC_DRAW);
 
 		//Texture Buffer
 		

@@ -5,6 +5,14 @@ class Mirror extends Drawable{
         vec3(0.5, -0.5, 0.5),
         vec3(0.5, 0.5, 0.5),
     ];
+    static textureCoords = [
+        vec2(0,0),
+        vec2(0,1),
+        vec2(1,1),
+        vec2(1,0),
+        
+        
+    ];
 
 
     static shaderProgram = -1;
@@ -13,6 +21,8 @@ class Mirror extends Drawable{
     static uModelMatrixShader = -1;
     static uCameraMatrixShader = -1;
     static uProjectionMatrixShader = -1;
+
+    static aTextureCoordShader = -1;
 
     //static uMatDiffColorShader = -1;
     static uMatSpecColorShader = -1;
@@ -61,16 +71,16 @@ class Mirror extends Drawable{
         gl.bindBuffer( gl.ARRAY_BUFFER, Mirror.positionBuffer);
         gl.bufferData( gl.ARRAY_BUFFER, flatten(Mirror.vertexPositions), gl.STATIC_DRAW );
 
-        /*
-        Mirror.textureBuffer = gl.createTexture();
+        
+        Mirror.textureBuffer = gl.createBuffer();
         gl.bindBuffer( gl.ARRAY_BUFFER, Mirror.textureBuffer);
-        gl.bufferData( gl.ARRAY_BUFFER, new Float32Array(Mirror.texsize * Mirror.texsize * 4), gl.STATIC_DRAW ); */
+        gl.bufferData( gl.ARRAY_BUFFER, flatten(Mirror.textureCoords), gl.STATIC_DRAW );
 
         // Associate our shader variables with our data buffer
         Mirror.aPositionShader = gl.getAttribLocation( Mirror.shaderProgram, "aPosition" );
 
         Mirror.uTextureUnitShader = gl.getUniformLocation(Mirror.shaderProgram, "uTextureUnit");
-
+        Mirror.aTextureCoordShader = gl.getAttribLocation( Mirror.shaderProgram, "aTexCoord" );
 
         Mirror.uModelMatrixShader = gl.getUniformLocation( Mirror.shaderProgram, "modelMatrix" );
         Mirror.uCameraMatrixShader = gl.getUniformLocation( Mirror.shaderProgram, "cameraMatrix" );
@@ -175,6 +185,8 @@ class Mirror extends Drawable{
 
         gl.bindBuffer(gl.ARRAY_BUFFER, Mirror.positionBuffer);
         gl.vertexAttribPointer(Mirror.aPositionShader, 3, gl.FLOAT, false, 0, 0);
+        gl.bindBuffer( gl.ARRAY_BUFFER, Mirror.textureBuffer);
+       	gl.vertexAttribPointer(Mirror.aTextureCoordShader, 2, gl.FLOAT, false, 0, 0 );
         gl.enableVertexAttribArray(Mirror.aPositionShader);
     
         gl.uniformMatrix4fv(Mirror.uModelMatrixShader, false, flatten(this.getModelMatrix()));
@@ -189,9 +201,13 @@ class Mirror extends Drawable{
         gl.uniform3fv(Mirror.uLightDirectionShader, light1.direction);
         gl.uniform4fv(Mirror.uLightColorShader, light1.color);
 
+        gl.enableVertexAttribArray(Mirror.aTextureCoordShader);  
+
         // Draw the object
         gl.drawArrays(gl.TRIANGLE_FAN, 0, Mirror.vertexPositions.length); 
         gl.disableVertexAttribArray(Mirror.aPositionShader);
+        gl.disableVertexAttribArray(Mirror.aTextureCoordShader);
+
        
     }
 

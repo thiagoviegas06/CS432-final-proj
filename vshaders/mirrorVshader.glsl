@@ -32,4 +32,5 @@ void main() {
     // Correct reflection vector
     vec3 R = reflect(-V, N);
     vTexCoord = R.xy;
+    vTexCoord = aTexCoord;
 }
