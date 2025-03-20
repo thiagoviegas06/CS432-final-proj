@@ -130,7 +130,7 @@ class Mirror extends Drawable{
         gl.depthMask(false); 
     
         camera.u = vec3(-1, 0, 0);
-        camera.v = vec3(0, -1, 0);
+        camera.v = vec3(0, 1, 0);
         camera.n = vec3(0, 0, -1);
         
         // Attach texture to framebuffer
